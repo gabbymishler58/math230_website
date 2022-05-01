@@ -1,0 +1,14 @@
+---
+title: "Gabby Mishler"
+image: "gabby.png"
+links:
+  - label: LinkedIn
+    url: "https://www.linkedin.com/in/gabby-mishler-523a39232"
+  - label: Instagram
+    url: "https://www.instagram.com/gabbymishler58/"
+output:
+  postcards::jolla
+site: distill::distill_website  
+---
+ 
+I am a first-year statistics major at Bucknell University! I grew up in a small town in Bedford County, PA, where I have the most caring, supportive friends and family. It is hard to be away from them, but I know so many incredible opportunities lie ahead! My dream job is to work in the analytics department of an NHL team, and this course has brought me one step closer to it. Welcome to my MATH 230 journey!

@@ -1,0 +1,23 @@
+name: "GabbyMishler_Website"
+title: "A Walk Through MATH 230"
+theme: theme.css
+description: |
+  Final Project
+output_dir: "docs"
+navbar:
+  right:
+    - text: "Semester Projects"
+      href: Semester-Projects.html
+      menu:
+        - text: "Generative Art"
+          href: Generative-Art.html
+        - text: "GG Side Extension"
+          href: GG-Side.html
+        - text: "Personal Favorites"
+          href: Personal-Favorites.html 
+        - text: "Shiny Application"
+          href: Shiny-Application.html  
+    - text: "NHL Stats"
+      href: NHL-Stats.html
+output: distill::distill_article
+

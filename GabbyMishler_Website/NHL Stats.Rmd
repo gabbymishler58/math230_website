@@ -1,0 +1,139 @@
+---
+title: "The True Roles of Each Offensive and Defensive NHL Players"
+description: |
+  We'll be utilizing two data sets from NHL.com and QuantHockey.com that contain statistics of active skaters (all players excluding goaltenders) who played in at least 28 games during the 2020-21 NHL regular season. 
+site: distill::distill_website
+---
+
+```{r, echo = FALSE}
+NHL_Stats_2020_2021 = read.csv("NHL Stats 2020-2021.csv", header = TRUE, sep = ",")
+Defensive_Stats_Sheet1 = read.csv("Defensive Stats - Sheet1.csv", header = TRUE, sep = ",")
+attach(NHL_Stats_2020_2021) 
+attach(Defensive_Stats_Sheet1)
+```
+
+Centers are often considered the most valuable players on a hockey team, but who defines what it means to be "valuable?" In hockey, "valuable" is often thought of solely in terms of offensive presence (goals, assists, etc.), but through statistical analysis, we can see that "value" means more than the amount of goals that a player scores, and in fact, it reaches **all** positions.
+
+Before getting started, I wanted to address the relationship between games played and season point totals. Our intuition would most likely lead us to believe that as players play more games, they score more points. However, there is actually only a weak linear correlation between these two variables (~ 0.2), showing that many other factors can impact the number of points that a player scores, such as the opposing goalie's save percentage, odd-man rushes, powerplay opportunities, and more. This relationship is illustrated below.
+
+Moving forward, we will consider a relationship commonly analyzed in hockey: position and season point totals. Through the plot, we can see that a defenseman's median season point total is slightly lower than not only centers but also right wings and left wings, which often leads to NHL fans dismissing their talent. 
+
+```{r, echo = FALSE}
+library(ggplot2)
+library(ggside)
+NHL_Stats_2020_2021$Pos = factor(NHL_Stats_2020_2021$Pos, levels = c("C", "R", "L", "D"), labels = c("Center", "Right Wing", "Left Wing", "Defenseman"))
+ggplot(subset(NHL_Stats_2020_2021, GP >= 28), aes(x = GP, y = P, color = Pos)) +
+  geom_jitter(size = 3) +
+  ggtitle("Can Position Indicate the Amount of Points Scored Per Season?") +
+  xlab("Games Played") +
+  ylab("Season Point Totals") +
+  scale_colour_discrete("Position") +
+  geom_ysideboxplot(aes(x = as.numeric(Pos)), orientation = "x") +
+  theme(ggside.panel.scale = .3) +
+  scale_color_manual(values = colorchoice) +
+  scale_fill_manual(values = colorchoice)
+```
+
+```{r, echo = FALSE}
+# #NHL.Stats.2020.2021$S.C = factor(NHL.Stats.2020.2021$S.C, levels = c("R", "L"), labels = c("Right", "Left"))
+# ggplot(subset(NHL.Stats.2020.2021, GP >= 28), aes(x = Pos, y = round(as.numeric(S.), 0), fill = Pos)) + 
+#   geom_violin(trim = FALSE, alpha = 0.5) +
+#   geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.35) +
+#   stat_summary(fun = median, geom = "point", shape = 19, size = 3, color = "black") +
+#   ggtitle("Which Position Has the Best Shot?") +
+#   ylab("Shooting Percentage (%)") +
+#   xlab("Position") +
+#   scale_fill_discrete("Position") +
+#   coord_flip()
+```
+
+The same opinion is mirrored through shooting percentage. Offensive players tend to have a higher shooting percentage than defensive players, causing fans to underestimate the value that they bring to the game since goals are what directly lead to wins. However, what defensemen do outside of goalscoring is crucial for these wins to happen. 
+
+```{r, echo = FALSE}
+colnames(NHL_Stats_2020_2021)[22] = "ShootPercent"
+library(see)
+ggplot(subset(NHL_Stats_2020_2021, GP >= 28), aes(x = Pos, y = round(as.numeric(ShootPercent), 0), fill = Pos)) +
+  geom_violindot(fill_dots = "black", dots_size = 5) +
+  theme_modern() +
+  stat_summary(fun = median, geom = "point", shape = 19, size = 3, color = "black") +
+  ggtitle("Which Position Has the Best Shot?") +
+  ylab("Shooting Percentage (%)") +
+  xlab("Position") +
+  scale_fill_discrete("Position") +
+  scale_color_manual(values = colorchoice) +
+  scale_fill_manual(values = colorchoice) +
+  theme(legend.position = "none") 
+```
+
+Plus/minus (+/-) is a statistic that gives insight about how defensively responsible a player is. A player's plus/minus increases if they are on the ice when their team scores a goal, and it decreases if they are on the ice when a goal is scored against their team. The median plus/minus for all positions is roughly the same, showing that defensemen can easily match the levels of offensemen.
+
+```{r, echo = FALSE}
+colnames(NHL_Stats_2020_2021)[10] <- "PlusMinus"
+ggplot(subset(NHL_Stats_2020_2021, GP >= 28), aes(x = PlusMinus, y = Pos, fill = Pos)) +
+  geom_boxplot(outlier.shape = 8) +
+  ggtitle("Position Vs. Plus/Minus") +
+  xlab("Plus Minus (+/-)") +
+  ylab("Position") +
+  theme(legend.position = "none") +
+  scale_color_manual(values = colorchoice) +
+  scale_fill_manual(values = colorchoice)
+```
+
+Defensemen's skills shine through statistics like blocked shots and hits, actions that are not obvious by looking at the score of the game. 
+
+```{r, echo = FALSE}
+library(gridExtra)
+#Defensive_Stats_Sheet1$Pos = factor(Defensive_Stats_Sheet1$Pos, levels = c("R", "L", "D", "C"), labels = c("Right Wing", "Left Wing", "Defenseman", "Center"))
+#table = cbind(Position = c("Center", "Right Wing", "Left Wing", "Defenseman"), table(median(Defensive_Stats_Sheet1$HITS[Pos = "Defenseman"])))
+blocked_shots = ggplot(Defensive_Stats_Sheet1, aes(x = Pos, y = BS, fill = Pos)) +
+  geom_violin() +
+  coord_flip() +
+  theme(legend.position = "none") +
+  xlab("Position") +
+  ylab("Blocked Shots") +
+  ggtitle("Position Vs. Blocked Shots") +
+  stat_summary(fun = median, fun.min = function(z) { quantile(z,0.25) },
+  fun.max = function(z) { quantile(z,0.75) }, geom = "pointrange", color = "black") +
+  scale_color_manual(values = colorchoice) +
+  scale_fill_manual(values = colorchoice) 
+hits = ggplot(Defensive_Stats_Sheet1, aes(x = Pos, y = HITS, fill = Pos)) +
+  geom_violin() +
+  coord_flip() +
+  theme(legend.position = "none") +
+  xlab("Position") +
+  ylab("Hits") +
+  ggtitle("Position Vs. Hits") +
+  stat_summary(fun = median, fun.min = function(z) { quantile(z,0.25) },
+  fun.max = function(z) {quantile(z,0.75)}, geom = "pointrange", color = "black") +
+  scale_color_manual(values = colorchoice) +
+  scale_fill_manual(values = colorchoice) +
+  ylim(c(0, 100)) #Add if I can't figure out table
+  #annotate(geom = "table", x = 4, y = 0)
+grid.arrange(blocked_shots, hits, nrow = 1)
+#Add table
+```
+
+Defensemen also tend to have significantly more ice time per game than offensive players. Defensemen often utilize different muscle groups than offensive players since they spend a majority of their ice time skating backwards, which allows them to conserve energy. 
+
+```{r, echo = FALSE}
+colnames(NHL_Stats_2020_2021)[23] <- "TOI.GP"
+NHL_Stats_2020_2021$TOI.Num = (as.numeric(as.POSIXct(strptime(TOI.GP, format = "%M:%OS"))) - as.numeric(as.POSIXct(strptime("0", format = "%S")))) / 60
+TOI.mean = aggregate(TOI.Num ~ Pos, data = NHL_Stats_2020_2021, FUN = mean)
+colorchoice = c("darkslategray3", "darkolivegreen4", "darkorchid4", "deeppink3")
+ggplot(subset(NHL_Stats_2020_2021, GP >= 28), aes(x = TOI.Num, y = ..density.., color = Pos, fill = Pos)) +
+  geom_density(alpha = 0.2) +
+  geom_vline(data = TOI.mean, aes(xintercept = TOI.Num, color = Pos), linetype = "dashed") +
+  scale_color_manual(values = colorchoice) +
+  scale_fill_manual(values = colorchoice) +
+  ylab("Proportion of Players") +
+  xlab("Time on Ice Per Game (Minutes)") +
+  ggtitle("Time on Ice Based on Position")
+```
+
+All in all, each position has specialized roles that they need to fulfill. Centers, right wings, left wings, and defensemen contribute to the team through various media, offering their own forms of value and demonstrating that they're all an asset to their teams. Offensive players could have a critical win in the faceoff circle while defensive players could block a shot heading towards a wide open net, potentially saving the game in both scenarios. Each position takes care of their own responsibilities, and they deserve an equal amount of respect!
+
+```{r, echo = FALSE}
+detach(NHL_Stats_2020_2021)
+detach(Defensive_Stats_Sheet1)
+```
+

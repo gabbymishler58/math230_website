@@ -1,0 +1,13 @@
+---
+title: "Shiny Application"
+description: |
+  Peter, Danny, and I created a Shiny app to help introductory statistics students grasp the concept of a confidence level. An interactive sliding tool allows users to change the sample size, confidence level, and number of confidence intervals shown. Here is an example of what our Shiny app can output if the user would choose an 85% confidence level, 100 confidence intervals, and a sample size of 100:
+site: distill::distill_website
+---
+
+![G. Mishler "ShinyApp"](shinyapp.png)
+
+Click the link below to interact with our app!
+
+**https://rconnect.bucknell.edu/content/d99a79a6-2b68-42fa-a948-a58fbe07b00b**
+

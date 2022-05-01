@@ -1,0 +1,62 @@
+---
+title: "Favorite Projects"
+description: |
+  Here's a look at some of my favorite projects that I got to complete over the semester!
+site: distill::distill_website
+---
+
+# **Confidence Interval Error Bar Chart**
+
+Peter, Danny, and I collaborated on a project that was geared toward helping introductory statistics students understand confidence intervals. After lots of random sampling, we created an error bar plot to demonstrate how a confidence level worked and how it potentially affects the proportion of confidence intervals that capture the true parameter. For our graph, blue bars corresponds to confidence intervals that **do** capture the true parameter whereas red bars represent confidence intervals that **do not** capture the true parameter.
+
+```{r, echo = FALSE}
+a = NULL
+b = NULL
+pop = 1000
+samp = 100
+num = 100
+lev = 0.95
+set.seed(4)
+data = rnorm(pop)
+vec = NULL
+for(i in 1:num){
+vec[i] = mean(sample(data, samp))
+}
+CI = NULL
+for (i in 1:length(vec)){
+  a[i] = vec[i] - qnorm(1 - (1 - lev) / 2)*(1/(samp)^(1/2))
+  b[i] = vec[i] + qnorm(1 - (1 - lev) / 2)*(1 / (samp)^(1 / 2))
+  CI[i] = a[i] * b[i] < 0
+}
+tot = NULL
+for (i in 1:length(pop)){
+  tot[i] = sum(CI[1]:CI[i]) / i
+}
+
+val = qnorm(1 - (1 - lev) / 2) * (1 / (samp)^(1 / 2))
+qplot(seq_along(vec), vec)+
+   geom_point(aes(colour = CI))+
+   geom_errorbar(aes(ymin = vec - val, ymax = vec + val,colour = CI))+
+   geom_hline(yintercept = 0, color = "black")+
+   xlab("Number of Confidence Intervals Generated")+
+   ylab("Value")+
+   scale_colour_discrete(name="Confidence Interval\n with True Mean")+
+   ggtitle(paste("Confidence Level of",lev * 100,"%"))
+```
+
+
+# **SAT Score Heat Map**
+
+StudentSurvey is a dataset that contains information from a survey given to introductory statistics students over the course of several years. In this heat map, we will consider two of StudentSurvey's variables: Verbal SAT score and Math SAT Score. Heat maps utilize shading to denote different densities of a phenomenon. In this example, a lighter shade of blue represents where more of a phenomenon occurred, which can be seen within the inside of the plot, whereas a darker shade of blue represents where less of a phenomenon occurred, which is present more along the outside of the plot.
+
+```{r, echo = FALSE}
+library(Lock5Data)
+data(StudentSurvey)
+StudentSurvey = StudentSurvey[complete.cases(StudentSurvey), ]
+StudentSurvey$Year = factor(StudentSurvey$Year, 
+                          levels = c("FirstYear", "Sophomore", "Junior", "Senior"),
+                          ordered = TRUE)
+ggplot(StudentSurvey, aes(MathSAT, VerbalSAT)) + 
+  stat_density_2d(aes(fill = ..level..), geom = "polygon", color = "grey", h = c(50, 50)) +
+  ggtitle("SAT Score Heat Map")
+```

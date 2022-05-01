@@ -1,0 +1,10 @@
+---
+title: "Semester Projects"
+description: |
+  Here are some projects I've completed over the course of the semester.
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
