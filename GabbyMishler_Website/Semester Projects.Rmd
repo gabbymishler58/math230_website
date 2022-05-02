@@ -7,10 +7,9 @@ site: distill::distill_website
 
 ```{r, include = FALSE}
 library(aRtsy)
-
+library(distill)
 set.seed(11)
 bucknell = canvas_flow(colors = c("darkslateblue", "sienna2"), lines = 1000, background = "black", lwd = .4)
-
 ```
 
 ![G. Mishler Bucknell Artwork](bucknell.png)

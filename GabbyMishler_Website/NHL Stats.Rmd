@@ -1,5 +1,5 @@
 ---
-title: "The True Roles of Each Offensive and Defensive NHL Players"
+title: "The True Roles of Offensive and Defensive NHL Players"
 description: |
   We'll be utilizing two data sets from NHL.com and QuantHockey.com that contain statistics of active skaters (all players excluding goaltenders) who played in at least 28 games during the 2020-21 NHL regular season. 
 site: distill::distill_website
@@ -27,7 +27,7 @@ ggplot(subset(NHL_Stats_2020_2021, GP >= 28), aes(x = GP, y = P, color = Pos)) +
   ggtitle("Can Position Indicate the Amount of Points Scored Per Season?") +
   xlab("Games Played") +
   ylab("Season Point Totals") +
-  scale_colour_discrete("Position") +
+  labs(col = "Position") +
   geom_ysideboxplot(aes(x = as.numeric(Pos)), orientation = "x") +
   theme(ggside.panel.scale = .3) +
   scale_color_manual(values = colorchoice) +
@@ -59,13 +59,12 @@ ggplot(subset(NHL_Stats_2020_2021, GP >= 28), aes(x = Pos, y = round(as.numeric(
   ggtitle("Which Position Has the Best Shot?") +
   ylab("Shooting Percentage (%)") +
   xlab("Position") +
-  scale_fill_discrete("Position") +
   scale_color_manual(values = colorchoice) +
   scale_fill_manual(values = colorchoice) +
   theme(legend.position = "none") 
 ```
 
-Plus/minus (+/-) is a statistic that gives insight about how defensively responsible a player is. A player's plus/minus increases if they are on the ice when their team scores a goal, and it decreases if they are on the ice when a goal is scored against their team. The median plus/minus for all positions is roughly the same, showing that defensemen can easily match the levels of offensemen.
+Plus/minus (+/-) is a statistic that gives insight about how defensively responsible a player is. A player's plus/minus increases if they are on the ice when their team scores a goal, and it decreases if they are on the ice when a goal is scored against their team. The median plus/minus for all positions is roughly the same, showing that defensemen can easily match the skill levels of offensemen.
 
 ```{r, echo = FALSE}
 colnames(NHL_Stats_2020_2021)[10] <- "PlusMinus"
@@ -83,7 +82,8 @@ Defensemen's skills shine through statistics like blocked shots and hits, action
 
 ```{r, echo = FALSE}
 library(gridExtra)
-#Defensive_Stats_Sheet1$Pos = factor(Defensive_Stats_Sheet1$Pos, levels = c("R", "L", "D", "C"), labels = c("Right Wing", "Left Wing", "Defenseman", "Center"))
+library(ggplot2)
+Defensive_Stats_Sheet1$Pos = factor(Defensive_Stats_Sheet1$Pos, levels = c("R", "L", "D", "C"), labels = c("Right Wing", "Left Wing", "Defenseman", "Center"))
 #table = cbind(Position = c("Center", "Right Wing", "Left Wing", "Defenseman"), table(median(Defensive_Stats_Sheet1$HITS[Pos = "Defenseman"])))
 blocked_shots = ggplot(Defensive_Stats_Sheet1, aes(x = Pos, y = BS, fill = Pos)) +
   geom_violin() +
@@ -113,11 +113,11 @@ grid.arrange(blocked_shots, hits, nrow = 1)
 #Add table
 ```
 
-Defensemen also tend to have significantly more ice time per game than offensive players. Defensemen often utilize different muscle groups than offensive players since they spend a majority of their ice time skating backwards, which allows them to conserve energy. 
+Defensemen also tend to have significantly more ice time per game than offensive players. Offensive players usually skate with more urgency, switching directions quickly and consequently expending more energy, which causes them to need more rest time. Defensemen often utilize different muscle groups than offensive players since they spend a majority of their ice time skating backwards, which allows them to conserve energy and stay on the ice for longer periods of time.
 
 ```{r, echo = FALSE}
 colnames(NHL_Stats_2020_2021)[23] <- "TOI.GP"
-NHL_Stats_2020_2021$TOI.Num = (as.numeric(as.POSIXct(strptime(TOI.GP, format = "%M:%OS"))) - as.numeric(as.POSIXct(strptime("0", format = "%S")))) / 60
+NHL_Stats_2020_2021$TOI.Num = (as.numeric(as.POSIXct(strptime(NHL_Stats_2020_2021$TOI.GP, format = "%M:%OS"))) - as.numeric(as.POSIXct(strptime("0", format = "%S")))) / 60
 TOI.mean = aggregate(TOI.Num ~ Pos, data = NHL_Stats_2020_2021, FUN = mean)
 colorchoice = c("darkslategray3", "darkolivegreen4", "darkorchid4", "deeppink3")
 ggplot(subset(NHL_Stats_2020_2021, GP >= 28), aes(x = TOI.Num, y = ..density.., color = Pos, fill = Pos)) +
